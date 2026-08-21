@@ -75,6 +75,7 @@ impl Grid {
         }
     }
 
+    #[allow(dead_code)] // usados desde la etapa 3 (colisión y detección de meta)
     pub fn tile_at(&self, x: usize, y: usize) -> Option<Tile> {
         if x < self.width && y < self.height {
             Some(self.tiles[y * self.width + x])
@@ -83,6 +84,7 @@ impl Grid {
         }
     }
 
+    #[allow(dead_code)]
     pub fn is_solid(&self, x: usize, y: usize) -> bool {
         matches!(
             self.tile_at(x, y),
