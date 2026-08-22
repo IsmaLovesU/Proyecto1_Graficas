@@ -1,3 +1,4 @@
+use crate::media::Atlas;
 use crate::world::grid::Surface;
 use crate::world::Actor;
 use crate::world::Grid;
@@ -5,9 +6,15 @@ use crate::world::Grid;
 use super::dda;
 use super::Framebuffer;
 
-/// Pinta el techo, el piso y las columnas de pared para el frame actual.
+/// Pinta el techo, el piso y las columnas de pared texturizadas para el frame actual.
 /// Llena `zbuf` con la distancia perpendicular de cada columna para el recorte de sprites.
-pub fn paint_scene(fb: &mut Framebuffer, actor: &Actor, grid: &Grid, zbuf: &mut [f32]) {
+pub fn paint_scene(
+    fb: &mut Framebuffer,
+    actor: &Actor,
+    grid: &Grid,
+    zbuf: &mut [f32],
+    atlas: &Atlas,
+) {
     let w = fb.width;
     let h = fb.height;
 
@@ -41,15 +48,16 @@ pub fn paint_scene(fb: &mut Framebuffer, actor: &Actor, grid: &Grid, zbuf: &mut 
                 let span = (proj_dist * crate::TILE_UNITS / contact.distance) as i32;
                 let top = (h as i32 / 2) - span / 2;
                 let bot = top + span;
-
-                // Las caras horizontales (norte/sur) se oscurecen para dar relieve.
-                let color = if contact.is_horizontal {
-                    darken(flat_color(contact.surface))
-                } else {
-                    flat_color(contact.surface)
-                };
+                let idx = surface_idx(contact.surface);
 
                 for row in (top.max(0) as usize)..(bot.min(h as i32) as usize) {
+                    // v va de 0 en el borde superior del tile a 1 en el inferior,
+                    // incluso cuando la columna queda recortada por el borde de pantalla.
+                    let v = (row as f32 - top as f32) / span as f32;
+                    let mut color = atlas.wall_pixel(idx, contact.column_offset, v);
+                    if contact.is_horizontal {
+                        color = darken(color);
+                    }
                     fb.point(col, row, color);
                 }
             }
@@ -57,10 +65,12 @@ pub fn paint_scene(fb: &mut Framebuffer, actor: &Actor, grid: &Grid, zbuf: &mut 
     }
 }
 
-fn flat_color(surface: Surface) -> u32 {
+fn surface_idx(surface: Surface) -> usize {
     match surface {
-        Surface::Vertical | Surface::Horizontal | Surface::Post => 0xB87848,
-        Surface::Door => 0xD4A030,
+        Surface::Vertical => 0,
+        Surface::Horizontal => 1,
+        Surface::Post => 2,
+        Surface::Door => 3,
     }
 }
 

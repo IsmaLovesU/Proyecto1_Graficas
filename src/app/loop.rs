@@ -1,5 +1,6 @@
 use raylib::prelude::*;
 
+use crate::media::Atlas;
 use crate::render::columns::paint_scene;
 use crate::render::Framebuffer;
 use crate::world::{Actor, Grid};
@@ -7,6 +8,7 @@ use crate::world::{Actor, Grid};
 use super::{Clock, Stage};
 
 pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
+    let atlas = Atlas::load();
     let mut actor = Actor::new(grid.find_spawn());
 
     let mut fb = Framebuffer::new(crate::SCREEN_WIDTH as usize, crate::SCREEN_HEIGHT as usize);
@@ -52,7 +54,7 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
                 fb.clear();
             }
             Stage::Playing => {
-                paint_scene(&mut fb, &actor, &grid, &mut zbuf);
+                paint_scene(&mut fb, &actor, &grid, &mut zbuf, &atlas);
             }
         }
 
