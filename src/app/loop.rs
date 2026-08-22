@@ -1,6 +1,7 @@
 use raylib::prelude::*;
 
 use crate::media::Atlas;
+use crate::render::billboard::paint_sprites;
 use crate::render::columns::paint_scene;
 use crate::render::Framebuffer;
 use crate::world::{Actor, Grid};
@@ -55,6 +56,10 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
             }
             Stage::Playing => {
                 paint_scene(&mut fb, &actor, &grid, &mut zbuf, &atlas);
+                // El frame avanza por tiempo (no por numero de render) para que la
+                // velocidad de la llama no dependa de los FPS del juego.
+                let frame_idx = (clock.total * 10.0) as usize % 8;
+                paint_sprites(&mut fb, &actor, &zbuf, &atlas, frame_idx);
             }
         }
 

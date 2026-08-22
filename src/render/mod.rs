@@ -1,3 +1,4 @@
+pub mod billboard;
 pub mod columns;
 pub mod dda;
 pub mod framebuffer;
