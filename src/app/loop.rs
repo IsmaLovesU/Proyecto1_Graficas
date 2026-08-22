@@ -25,6 +25,13 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
         .load_texture_from_image(&thread, &img)
         .expect("no se pudo crear la textura del framebuffer");
 
+    let welcome_tex = rl
+        .load_texture(&thread, "assets/images/imagenBienvenida.png")
+        .expect("no se pudo cargar 'assets/images/imagenBienvenida.png'");
+    let success_tex = rl
+        .load_texture(&thread, "assets/images/imagenExito.png")
+        .expect("no se pudo cargar 'assets/images/imagenExito.png'");
+
     let mut clock = Clock::new();
     let mut stage = Stage::Welcome;
 
@@ -81,22 +88,54 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
         d.clear_background(Color::BLACK);
         d.draw_texture(&texture, 0, 0, Color::WHITE);
 
+        let sw = crate::SCREEN_WIDTH as f32;
+        let sh = crate::SCREEN_HEIGHT as f32;
         match stage {
-            Stage::Welcome => d.draw_text(
-                "LABERINTO  --  presiona ENTER para empezar",
-                100,
-                crate::SCREEN_HEIGHT / 2,
-                22,
-                Color::WHITE,
-            ),
+            Stage::Welcome => {
+                d.draw_texture_pro(
+                    &welcome_tex,
+                    Rectangle::new(
+                        0.0,
+                        0.0,
+                        welcome_tex.width as f32,
+                        welcome_tex.height as f32,
+                    ),
+                    Rectangle::new(0.0, 0.0, sw, sh),
+                    Vector2::new(0.0, 0.0),
+                    0.0,
+                    Color::WHITE,
+                );
+                d.draw_text(
+                    "Presiona ENTER para empezar",
+                    20,
+                    crate::SCREEN_HEIGHT - 40,
+                    26,
+                    Color::WHITE,
+                );
+            }
             Stage::Playing => d.draw_fps(10, 10),
-            Stage::Success => d.draw_text(
-                "Llegaste a la meta!  --  ENTER para jugar de nuevo",
-                80,
-                crate::SCREEN_HEIGHT / 2,
-                22,
-                Color::GREEN,
-            ),
+            Stage::Success => {
+                d.draw_texture_pro(
+                    &success_tex,
+                    Rectangle::new(
+                        0.0,
+                        0.0,
+                        success_tex.width as f32,
+                        success_tex.height as f32,
+                    ),
+                    Rectangle::new(0.0, 0.0, sw, sh),
+                    Vector2::new(0.0, 0.0),
+                    0.0,
+                    Color::WHITE,
+                );
+                d.draw_text(
+                    "Llegaste a la meta!  --  ENTER para jugar de nuevo",
+                    20,
+                    crate::SCREEN_HEIGHT - 40,
+                    26,
+                    Color::GREEN,
+                );
+            }
         }
     }
 }
