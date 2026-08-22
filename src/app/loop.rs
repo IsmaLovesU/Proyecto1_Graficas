@@ -1,5 +1,6 @@
 use raylib::prelude::*;
 
+use crate::render::columns::paint_scene;
 use crate::render::Framebuffer;
 use crate::world::{Actor, Grid};
 
@@ -9,6 +10,7 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
     let mut actor = Actor::new(grid.find_spawn());
 
     let mut fb = Framebuffer::new(crate::SCREEN_WIDTH as usize, crate::SCREEN_HEIGHT as usize);
+    let mut zbuf = vec![f32::INFINITY; crate::SCREEN_WIDTH as usize];
 
     let img = Image::gen_image_color(crate::SCREEN_WIDTH, crate::SCREEN_HEIGHT, Color::BLACK);
     let mut texture = rl
@@ -21,7 +23,6 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
     while !rl.window_should_close() {
         clock.tick(rl.get_frame_time());
 
-        // Actualización de estado según la entrada del teclado
         match stage {
             Stage::Welcome => {
                 if rl.is_key_pressed(KeyboardKey::KEY_ENTER) {
@@ -45,13 +46,14 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
             }
         }
 
-        // Render al framebuffer según el estado actual
         match stage {
             Stage::Welcome | Stage::Success => {
                 fb.set_background(0x1A1A26);
                 fb.clear();
             }
-            Stage::Playing => paint_background(&mut fb),
+            Stage::Playing => {
+                paint_scene(&mut fb, &actor, &grid, &mut zbuf);
+            }
         }
 
         texture
@@ -78,22 +80,6 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
                 22,
                 Color::GREEN,
             ),
-        }
-    }
-}
-
-// Pinta el fondo de la vista de juego: media pantalla de techo, media de piso.
-// En la etapa 4 esto se reemplaza por columnas con DDA.
-fn paint_background(fb: &mut Framebuffer) {
-    let mid = fb.height / 2;
-    for y in 0..fb.height {
-        let color = if y < mid {
-            crate::CEILING_COLOR
-        } else {
-            crate::FLOOR_COLOR
-        };
-        for x in 0..fb.width {
-            fb.point(x, y, color);
         }
     }
 }
