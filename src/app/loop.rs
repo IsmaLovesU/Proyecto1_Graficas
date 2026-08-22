@@ -1,6 +1,7 @@
+use raylib::audio::RaylibAudio;
 use raylib::prelude::*;
 
-use crate::media::Atlas;
+use crate::media::{Atlas, Jukebox};
 use crate::render::billboard::paint_sprites;
 use crate::render::columns::paint_scene;
 use crate::render::overlay::paint_overlay;
@@ -10,7 +11,10 @@ use crate::world::{Actor, Grid};
 use super::{Clock, Stage};
 
 pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
+    let audio =
+        RaylibAudio::init_audio_device().expect("no se pudo inicializar el dispositivo de audio");
     let atlas = Atlas::load();
+    let mut jukebox = Jukebox::load(&audio);
     let mut actor = Actor::new(grid.find_spawn());
 
     let mut fb = Framebuffer::new(crate::SCREEN_WIDTH as usize, crate::SCREEN_HEIGHT as usize);
@@ -36,9 +40,13 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
             }
             Stage::Playing => {
                 actor.update(&rl, &grid, clock.dt);
+                let is_walking =
+                    rl.is_key_down(KeyboardKey::KEY_UP) || rl.is_key_down(KeyboardKey::KEY_DOWN);
+                jukebox.update(clock.dt, is_walking);
                 if actor.has_reached_goal(&grid) {
                     stage = Stage::Success;
                     rl.enable_cursor();
+                    jukebox.play_victory();
                 }
             }
             Stage::Success => {
