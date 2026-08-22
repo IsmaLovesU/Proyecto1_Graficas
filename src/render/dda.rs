@@ -5,15 +5,13 @@ pub struct Contact {
     /// El DDA la da libre de ojo de pez sin necesidad de correccion posterior.
     pub distance: f32,
     /// Fraccion horizontal dentro del tile impactado (coordenada U para textura).
-    #[allow(dead_code)] // se lee en la etapa 5 al muestrear las texturas de pared
     pub column_offset: f32,
     pub surface: Surface,
     /// true = cara norte/sur (limite en Y), false = cara este/oeste (limite en X).
     pub is_horizontal: bool,
 }
 
-/// Lanza un rayo desde `origin` en direccion `angle` y devuelve el primer tile solido.
-/// Trabaja en espacio de tiles; la distancia del Contact esta en unidades de mundo.
+// La distancia del Contact resultante esta en unidades de mundo, no en tiles.
 pub fn cast_ray(origin: (f32, f32), angle: f32, grid: &Grid) -> Option<Contact> {
     let dir_x = angle.cos();
     let dir_y = angle.sin();

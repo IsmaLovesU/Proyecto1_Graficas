@@ -1,0 +1,5 @@
+/target
+**/*.rs.bk
+
+# cancion que no se puede distribuir por derechos de autor ... ;)
+assets/audio/bgm.ogg

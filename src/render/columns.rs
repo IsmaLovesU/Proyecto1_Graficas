@@ -6,8 +6,8 @@ use crate::world::Grid;
 use super::dda;
 use super::Framebuffer;
 
-/// Pinta el techo, el piso y las columnas de pared texturizadas para el frame actual.
-/// Llena `zbuf` con la distancia perpendicular de cada columna para el recorte de sprites.
+// zbuf queda relleno con la distancia perpendicular por columna; los sprites lo consultan
+// para descartarse cuando quedan detras de una pared.
 pub fn paint_scene(
     fb: &mut Framebuffer,
     actor: &Actor,

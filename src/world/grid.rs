@@ -8,7 +8,6 @@ pub enum Surface {
     Vertical,
     Horizontal,
     Post,
-    #[allow(dead_code)] // se usa en la etapa 5 al muestrear la textura de la puerta
     Door,
 }
 
@@ -87,7 +86,6 @@ impl Grid {
         matches!(self.tile_at(x, y), Some(Tile::Solid(_)) | None)
     }
 
-    /// Coordenadas en celdas del primer Spawn encontrado en el mapa.
     pub fn find_spawn(&self) -> (usize, usize) {
         for y in 0..self.height {
             for x in 0..self.width {
