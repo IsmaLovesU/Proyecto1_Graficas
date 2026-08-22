@@ -1,13 +1,12 @@
 use raylib::prelude::*;
 
 use crate::render::Framebuffer;
-use crate::world::Grid;
+use crate::world::{Actor, Grid};
 
 use super::{Clock, Stage};
 
 pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
-    // Posición del actor; se usa en la etapa 3 al crear Actor.
-    let _spawn = grid.find_spawn();
+    let mut actor = Actor::new(grid.find_spawn());
 
     let mut fb = Framebuffer::new(crate::SCREEN_WIDTH as usize, crate::SCREEN_HEIGHT as usize);
 
@@ -30,9 +29,16 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
                     rl.disable_cursor();
                 }
             }
-            Stage::Playing => {}
+            Stage::Playing => {
+                actor.update(&rl, &grid, clock.dt);
+                if actor.has_reached_goal(&grid) {
+                    stage = Stage::Success;
+                    rl.enable_cursor();
+                }
+            }
             Stage::Success => {
                 if rl.is_key_pressed(KeyboardKey::KEY_ENTER) {
+                    actor = Actor::new(grid.find_spawn());
                     stage = Stage::Playing;
                     rl.disable_cursor();
                 }
