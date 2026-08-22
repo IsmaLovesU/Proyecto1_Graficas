@@ -3,6 +3,7 @@ use raylib::prelude::*;
 use crate::media::Atlas;
 use crate::render::billboard::paint_sprites;
 use crate::render::columns::paint_scene;
+use crate::render::overlay::paint_overlay;
 use crate::render::Framebuffer;
 use crate::world::{Actor, Grid};
 
@@ -60,6 +61,7 @@ pub fn run(mut rl: RaylibHandle, thread: RaylibThread, grid: Grid) {
                 // velocidad de la llama no dependa de los FPS del juego.
                 let frame_idx = (clock.total * 10.0) as usize % 8;
                 paint_sprites(&mut fb, &actor, &zbuf, &atlas, frame_idx);
+                paint_overlay(&mut fb, &actor, &grid);
             }
         }
 
